@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest_tmp/
+.venv/
+venv/
+.tmp/
+tmp/
+tmppdpfsm5s/
+tmptestmanual/
+
+logs/*.log
+logs/screenshots/
+
+.env
+.env.*
+!.env.example
