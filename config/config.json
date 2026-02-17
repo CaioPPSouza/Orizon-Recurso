@@ -1,0 +1,42 @@
+{
+  "spreadsheet": {
+    "sheet_name": "Planilha Analisada"
+  },
+  "bot": {
+    "portal_url": "https://portal.orizon.com.br",
+    "headless": false,
+    "wait_timeout_ms": 120000,
+    "slow_mo_ms": 0,
+    "login_mode": "manual",
+    "post_login_selector": "role=link[name=/glosas?/i]",
+    "error_mode": "tolerant",
+    "screenshot_on_error": true,
+    "screenshot_dir": "logs/screenshots",
+    "object_resource_value": "Recurso de Guia",
+    "grau_participacao_value": "Executante",
+    "navigation_steps": [
+      "role=link[name=/glosas?/i]",
+      "role=link[name=/recursos?/i]"
+    ],
+    "selectors": {
+      "new_guide_button": "role=button[name=/nova guia|novo recurso/i]",
+      "object_resource_field": "label=/objeto.*recurso/i",
+      "protocol_number_field": "label=/protocolo/i",
+      "provider_identifier_field": "label=/prestador/i",
+      "resource_type_field": "label=/tipo.*recurso/i",
+      "origin_guide_number_field": "label=/guia.*prestador/i",
+      "password_field": "label=/senha/i",
+      "operator_guide_number_field": "label=/guia.*operadora/i",
+      "new_procedure_button": "role=button[name=/novo procedimento|incluir procedimento/i]",
+      "service_date_field": "label=/data.*realiza[cç][aã]o/i",
+      "gloss_code_field": "label=/tipo.*glosa/i",
+      "participation_degree_field": "label=/grau.*participa[cç][aã]o/i",
+      "procedure_code_field": "label=/c[oó]digo.*procedimento/i",
+      "procedure_description_field": "label=/descri[cç][aã]o.*procedimento/i",
+      "justification_field": "label=/justificativa/i",
+      "value_field": "label=/valor.*glosado/i",
+      "save_procedure_button": "role=button[name=/salvar procedimento|gravar procedimento/i]",
+      "save_guide_button": "role=button[name=/salvar guia|gravar guia/i]"
+    }
+  }
+}
