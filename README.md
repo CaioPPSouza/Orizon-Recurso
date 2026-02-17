@@ -41,6 +41,11 @@ Edite `config/config.json`:
 
 - `bot.object_resource_value`: valor do combo "Objeto Recurso".
 - `bot.grau_participacao_value`: valor do campo "Grau de participacao".
+- `bot.login_mode`: `manual` (aguarda login humano) ou `automatic` (preenche e envia login).
+- `bot.login_username` e `bot.login_password`: credenciais para login automatico.
+- `bot.login_username_selector`, `bot.login_password_selector`, `bot.login_submit_selector`: seletores da tela de login.
+- `ORIZON_LOGIN_USERNAME` e `ORIZON_LOGIN_PASSWORD`: fallback por variaveis de ambiente quando usuario/senha nao estao no JSON.
+- Nao versione credenciais reais no repositório.
 - `bot.navigation_steps`: lista de seletores para navegar no menu ate a tela de recurso.
 - `bot.selectors`: seletores dos campos e botoes do portal.
 - `bot.error_mode`: `tolerant` (continua em falhas) ou `strict` (para na primeira falha).

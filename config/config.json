@@ -3,11 +3,16 @@
     "sheet_name": "Planilha Analisada"
   },
   "bot": {
-    "portal_url": "https://portal.orizon.com.br",
+    "portal_url": "https://portal.orizon.com.br/fature/login",
     "headless": false,
     "wait_timeout_ms": 120000,
     "slow_mo_ms": 0,
     "login_mode": "manual",
+    "login_username": "",
+    "login_password": "",
+    "login_username_selector": "#username",
+    "login_password_selector": "#password",
+    "login_submit_selector": "#kc-login",
     "post_login_selector": "role=link[name=/glosas?/i]",
     "error_mode": "tolerant",
     "screenshot_on_error": true,

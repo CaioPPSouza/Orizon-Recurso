@@ -38,6 +38,11 @@ class BotSettings:
     grau_participacao_value: str
     error_mode: str = "tolerant"
     login_mode: str = "manual"
+    login_username: str = ""
+    login_password: str = ""
+    login_username_selector: str = "#username"
+    login_password_selector: str = "#password"
+    login_submit_selector: str = "#kc-login"
     post_login_selector: str = ""
     slow_mo_ms: int = 0
     screenshot_on_error: bool = True
@@ -127,15 +132,41 @@ class OrizonAutomator:
         page.goto(self.settings.portal_url, wait_until="domcontentloaded", timeout=self.settings.wait_timeout_ms)
 
     def _login_if_needed(self, page: Page, callbacks: RunCallbacks) -> None:
-        if self.settings.login_mode != "manual":
-            raise AutomationConfigurationError(
-                "Somente login manual esta habilitado no MVP. Configure 'login_mode' como 'manual'."
+        if self.settings.login_mode == "manual":
+            if not self.settings.post_login_selector:
+                callbacks.log("Login manual sem seletor de confirmacao. Continuando fluxo sem validacao adicional.")
+                return
+
+            callbacks.log("Aguardando login manual no portal.")
+            page.locator(self.settings.post_login_selector).first.wait_for(
+                state="visible",
+                timeout=self.settings.wait_timeout_ms,
             )
-        if not self.settings.post_login_selector:
-            callbacks.log("Login manual sem seletor de confirmacao. Continuando fluxo sem validacao adicional.")
+            callbacks.log("Login detectado com sucesso.")
             return
 
-        callbacks.log("Aguardando login manual no portal.")
+        if self.settings.login_mode != "automatic":
+            raise AutomationConfigurationError(
+                "Valor invalido para 'bot.login_mode'. Use 'manual' ou 'automatic'."
+            )
+
+        callbacks.log("Realizando login automatico.")
+        self._set_value(page, self.settings.login_username_selector, self.settings.login_username)
+        self._set_value(page, self.settings.login_password_selector, self.settings.login_password)
+
+        if self.settings.login_submit_selector.strip():
+            self._click(page, self.settings.login_submit_selector)
+        else:
+            page.locator(self.settings.login_password_selector).first.press(
+                "Enter",
+                timeout=self.settings.wait_timeout_ms,
+            )
+
+        if not self.settings.post_login_selector:
+            callbacks.log("Login automatico enviado sem seletor de confirmacao. Continuando fluxo.")
+            return
+
+        callbacks.log("Aguardando confirmacao do login automatico.")
         page.locator(self.settings.post_login_selector).first.wait_for(
             state="visible",
             timeout=self.settings.wait_timeout_ms,
@@ -260,8 +291,24 @@ class OrizonAutomator:
             )
         if self.settings.error_mode not in {"tolerant", "strict"}:
             raise AutomationConfigurationError("Valor invalido para 'bot.error_mode'. Use 'tolerant' ou 'strict'.")
-        if self.settings.login_mode != "manual":
-            raise AutomationConfigurationError("No MVP, configure 'bot.login_mode' como 'manual'.")
+        if self.settings.login_mode not in {"manual", "automatic"}:
+            raise AutomationConfigurationError("Valor invalido para 'bot.login_mode'. Use 'manual' ou 'automatic'.")
+
+        if self.settings.login_mode == "automatic":
+            if not self.settings.login_username.strip():
+                raise AutomationConfigurationError(
+                    "Configure 'bot.login_username' no arquivo config/config.json "
+                    "ou defina a variavel de ambiente ORIZON_LOGIN_USERNAME."
+                )
+            if not self.settings.login_password.strip():
+                raise AutomationConfigurationError(
+                    "Configure 'bot.login_password' no arquivo config/config.json "
+                    "ou defina a variavel de ambiente ORIZON_LOGIN_PASSWORD."
+                )
+            if not self.settings.login_username_selector.strip():
+                raise AutomationConfigurationError("Configure 'bot.login_username_selector' no arquivo config/config.json.")
+            if not self.settings.login_password_selector.strip():
+                raise AutomationConfigurationError("Configure 'bot.login_password_selector' no arquivo config/config.json.")
 
         required_keys = [
             "new_guide_button",

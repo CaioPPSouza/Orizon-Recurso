@@ -53,3 +53,43 @@ def test_build_bot_settings_rejects_invalid_wait_timeout():
         build_bot_settings(config)
 
     assert "bot.wait_timeout_ms" in str(exc.value)
+
+
+def test_build_bot_settings_maps_automatic_login_fields():
+    config = {
+        "bot": {
+            "login_mode": "AUTOMATIC",
+            "login_username": "  usuario.teste  ",
+            "login_password": "  senha.teste  ",
+            "login_username_selector": "  #username  ",
+            "login_password_selector": "  #password  ",
+            "login_submit_selector": "  #kc-login  ",
+        }
+    }
+
+    settings = build_bot_settings(config)
+
+    assert settings.login_mode == "automatic"
+    assert settings.login_username == "usuario.teste"
+    assert settings.login_password == "senha.teste"
+    assert settings.login_username_selector == "#username"
+    assert settings.login_password_selector == "#password"
+    assert settings.login_submit_selector == "#kc-login"
+
+
+def test_build_bot_settings_uses_env_fallback_for_login_credentials(monkeypatch):
+    monkeypatch.setenv("ORIZON_LOGIN_USERNAME", "usuario.env")
+    monkeypatch.setenv("ORIZON_LOGIN_PASSWORD", "senha.env")
+
+    config = {
+        "bot": {
+            "login_mode": "automatic",
+            "login_username": "",
+            "login_password": "",
+        }
+    }
+
+    settings = build_bot_settings(config)
+
+    assert settings.login_username == "usuario.env"
+    assert settings.login_password == "senha.env"

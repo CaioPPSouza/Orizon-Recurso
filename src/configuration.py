@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,11 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "wait_timeout_ms": 120000,
         "slow_mo_ms": 0,
         "login_mode": "manual",
+        "login_username": "",
+        "login_password": "",
+        "login_username_selector": "#username",
+        "login_password_selector": "#password",
+        "login_submit_selector": "#kc-login",
         "post_login_selector": "",
         "error_mode": "tolerant",
         "screenshot_on_error": True,
@@ -62,6 +68,15 @@ def load_runtime_config(config_path: str | Path = Path("config/config.json")) ->
 def build_bot_settings(config: dict[str, Any]) -> BotSettings:
     bot = config.get("bot", {})
     defaults = DEFAULT_CONFIG["bot"]
+    login_username = _coerce_optional_string(bot.get("login_username", ""), default="")
+    login_password = _coerce_optional_string(bot.get("login_password", ""), default="")
+
+    # Prioriza config e usa variaveis de ambiente como fallback para credenciais.
+    if not login_username:
+        login_username = os.getenv("ORIZON_LOGIN_USERNAME", "").strip()
+    if not login_password:
+        login_password = os.getenv("ORIZON_LOGIN_PASSWORD", "").strip()
+
     return BotSettings(
         portal_url=_coerce_string(
             bot.get("portal_url", defaults["portal_url"]),
@@ -85,7 +100,21 @@ def build_bot_settings(config: dict[str, Any]) -> BotSettings:
         object_resource_value=_coerce_optional_string(bot.get("object_resource_value", ""), default=""),
         grau_participacao_value=_coerce_optional_string(bot.get("grau_participacao_value", ""), default=""),
         error_mode=_coerce_optional_string(bot.get("error_mode", "tolerant"), default="tolerant"),
-        login_mode=_coerce_optional_string(bot.get("login_mode", "manual"), default="manual"),
+        login_mode=_coerce_optional_string(bot.get("login_mode", "manual"), default="manual").lower(),
+        login_username=login_username,
+        login_password=login_password,
+        login_username_selector=_coerce_optional_string(
+            bot.get("login_username_selector", defaults["login_username_selector"]),
+            default=str(defaults["login_username_selector"]),
+        ),
+        login_password_selector=_coerce_optional_string(
+            bot.get("login_password_selector", defaults["login_password_selector"]),
+            default=str(defaults["login_password_selector"]),
+        ),
+        login_submit_selector=_coerce_optional_string(
+            bot.get("login_submit_selector", defaults["login_submit_selector"]),
+            default=str(defaults["login_submit_selector"]),
+        ),
         post_login_selector=_coerce_optional_string(bot.get("post_login_selector", ""), default=""),
         slow_mo_ms=_coerce_int(
             bot.get("slow_mo_ms", defaults["slow_mo_ms"]),
