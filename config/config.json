@@ -3,13 +3,13 @@
     "sheet_name": "Planilha Analisada"
   },
   "bot": {
-    "portal_url": "https://portal.orizon.com.br",
+    "portal_url": "https://sso-fature.orizon.com.br/auth/realms/orizon-dativa/protocol/openid-connect/auth?client_id=fature_client&response_type=code&scope=openid&redirect_uri=https://sso-auth-codeflow-fature-apicast-production.api.ocppr.orizon.com.br/sso/token?user_key=32efd36b405a07b8c0e6c6cb9c582047",
     "headless": false,
     "wait_timeout_ms": 120000,
     "slow_mo_ms": 0,
-    "login_mode": "manual",
-    "login_username": "",
-    "login_password": "",
+    "login_mode": "automatic",
+    "login_username": "caiophillipe",
+    "login_password": "Cefope2@26",
     "login_username_selector": "#username",
     "login_password_selector": "#password",
     "login_submit_selector": "#kc-login",
