@@ -40,6 +40,7 @@ pytest
 Edite `config/config.json`:
 
 - `bot.object_resource_value`: valor do combo "Objeto Recurso".
+- `bot.resource_option_value`: valor do combo "Opcao de Recurso" (ex.: `Itens Guia`).
 - `bot.grau_participacao_value`: valor do campo "Grau de participacao".
 - `bot.selected_operator_code`: codigo da operadora (`5711`, `421715`, `333689`) para a execucao atual.
 - `bot.login_mode`: `manual` (aguarda login humano) ou `automatic` (preenche e envia login).
@@ -49,6 +50,10 @@ Edite `config/config.json`:
 - `bot.post_login_url`: URL opcional aberta automaticamente apos o login confirmado.
 - `bot.post_login_open_new_tab`: quando `true`, abre `post_login_url` em nova aba e continua o fluxo nela.
 - `bot.close_notifications_after_login`: tenta fechar popups/notificacoes apos login.
+- `bot.use_existing_browser`: conecta ao Chrome ja aberto via CDP (em vez de abrir um Chromium novo).
+- `bot.existing_browser_cdp_url`: endpoint CDP do Chrome aberto (padrao `http://127.0.0.1:9222`).
+- `bot.start_from_current_page`: quando `true`, usa a aba atual e pula abertura do portal/login/navegacao.
+- `bot.execution_mode`: `full` (fluxo completo) ou `header_protocol_only` (preenche apenas Objeto do Recurso + N do Protocolo).
 - `bot.notification_close_selectors`: lista de seletores para botoes de fechar notificacao.
 - Inclui suporte ao tutorial inicial (`Terminar`) e modais com botao `Fechar`.
 - Apos login confirmado, o fluxo aguarda 10 segundos e envia `ESC` para dispensar janelas iniciais.
@@ -58,6 +63,7 @@ Edite `config/config.json`:
 - `bot.navigation_steps`: lista de seletores para navegar no menu ate a tela de recurso.
 - `bot.selectors`: seletores dos campos e botoes do portal.
 - `bot.error_mode`: `tolerant` (continua em falhas) ou `strict` (para na primeira falha).
+- Para `use_existing_browser=true`, inicie o Chrome com depuracao remota (`--remote-debugging-port=9222`).
 
 `config/config.json` ja vem com seletores validados para o fluxo:
 `+Serviços -> Modulo de Glosas -> Digitacao de Recurso -> Criar nova Guia de Recurso`.

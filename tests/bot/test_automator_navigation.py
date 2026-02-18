@@ -72,3 +72,101 @@ def test_rejects_invalid_selected_operator_code():
 
     with pytest.raises(AutomationConfigurationError):
         OrizonAutomator(invalid_settings)
+
+
+def test_rejects_start_from_current_page_without_existing_browser():
+    invalid_settings = replace(_build_settings(), start_from_current_page=True, use_existing_browser=False)
+
+    with pytest.raises(AutomationConfigurationError):
+        OrizonAutomator(invalid_settings)
+
+
+def test_rejects_invalid_execution_mode():
+    invalid_settings = replace(_build_settings(), execution_mode="partial")
+
+    with pytest.raises(AutomationConfigurationError):
+        OrizonAutomator(invalid_settings)
+
+
+def test_rejects_empty_resource_option_value():
+    invalid_settings = replace(_build_settings(), resource_option_value="")
+
+    with pytest.raises(AutomationConfigurationError):
+        OrizonAutomator(invalid_settings)
+
+
+def test_normalize_provider_identifier_removes_decimal_suffix():
+    automator = OrizonAutomator(_build_settings())
+
+    normalized = automator._normalize_provider_identifier("123456.0")
+
+    assert normalized == "123456"
+
+
+def test_normalize_provider_identifier_keeps_digits_from_formatted_text():
+    automator = OrizonAutomator(_build_settings())
+
+    normalized = automator._normalize_provider_identifier("12.345.678/0001-99")
+
+    assert normalized == "12345678000199"
+
+
+def test_build_operator_option_selectors_handles_5711_alias():
+    automator = OrizonAutomator(_build_settings())
+
+    selectors = automator._build_operator_option_selectors("5711")
+    candidates = automator._build_operator_code_candidates("5711")
+
+    assert any("005711" in selector for selector in selectors)
+    assert any("5711" in selector for selector in selectors)
+    assert "005711" in candidates
+    assert "5711" in candidates
+
+
+def test_build_operator_option_selectors_for_421715():
+    automator = OrizonAutomator(_build_settings())
+
+    selectors = automator._build_operator_option_selectors("421715")
+    exact_selectors = automator._build_operator_exact_item_selectors("421715")
+
+    assert any("421715" in selector for selector in selectors)
+    assert any("LBI1" in selector for selector in exact_selectors)
+
+
+def test_normalize_password_key_trims_and_uppercases():
+    automator = OrizonAutomator(_build_settings())
+
+    key = automator._normalize_password_key("  j7464c0 ")
+
+    assert key == "J7464C0"
+
+
+def test_is_guide_form_visible_accepts_structural_markers(monkeypatch):
+    settings = _build_settings()
+    selectors = dict(settings.selectors)
+    selectors["object_resource_field"] = "#missing_object"
+    selectors["protocol_number_field"] = "#missing_protocol"
+    selectors["provider_identifier_field"] = "#missing_provider"
+    automator = OrizonAutomator(replace(settings, selectors=selectors))
+
+    visible_selectors = {
+        "text=/recurso\\s+de\\s+glosa/i",
+        "text=/protocolo\\s+de\\s+faturamento/i",
+    }
+    monkeypatch.setattr(automator, "_has_visible_selector", lambda _page, selector: selector in visible_selectors)
+
+    assert automator._is_guide_form_visible(object())
+
+
+def test_is_guide_form_visible_requires_two_structural_markers(monkeypatch):
+    settings = _build_settings()
+    selectors = dict(settings.selectors)
+    selectors["object_resource_field"] = "#missing_object"
+    selectors["protocol_number_field"] = "#missing_protocol"
+    selectors["provider_identifier_field"] = "#missing_provider"
+    automator = OrizonAutomator(replace(settings, selectors=selectors))
+
+    visible_selectors = {"text=/recurso\\s+de\\s+glosa/i"}
+    monkeypatch.setattr(automator, "_has_visible_selector", lambda _page, selector: selector in visible_selectors)
+
+    assert not automator._is_guide_form_visible(object())

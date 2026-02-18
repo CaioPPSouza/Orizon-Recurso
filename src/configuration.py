@@ -28,6 +28,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "post_login_url": "",
         "post_login_open_new_tab": False,
         "close_notifications_after_login": True,
+        "use_existing_browser": False,
+        "existing_browser_cdp_url": "http://127.0.0.1:9222",
+        "start_from_current_page": False,
+        "execution_mode": "full",
         "notification_close_selectors": [
             "#botaoMensagemInicialModalPrestador",
             "#mensagemInicialModalPrestador button:has-text('Fechar')",
@@ -64,6 +68,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "screenshot_on_error": True,
         "screenshot_dir": "logs/screenshots",
         "object_resource_value": "",
+        "resource_option_value": "Itens Guia",
         "grau_participacao_value": "",
         "selected_operator_code": "",
         "navigation_steps": [],
@@ -134,6 +139,10 @@ def build_bot_settings(config: dict[str, Any]) -> BotSettings:
             field_name="bot.selectors",
         ),
         object_resource_value=_coerce_optional_string(bot.get("object_resource_value", ""), default=""),
+        resource_option_value=_coerce_optional_string(
+            bot.get("resource_option_value", defaults["resource_option_value"]),
+            default=str(defaults["resource_option_value"]),
+        ),
         grau_participacao_value=_coerce_optional_string(bot.get("grau_participacao_value", ""), default=""),
         selected_operator_code=_coerce_optional_string(bot.get("selected_operator_code", ""), default=""),
         error_mode=_coerce_optional_string(bot.get("error_mode", "tolerant"), default="tolerant"),
@@ -162,6 +171,22 @@ def build_bot_settings(config: dict[str, Any]) -> BotSettings:
             bot.get("close_notifications_after_login", defaults["close_notifications_after_login"]),
             "bot.close_notifications_after_login",
         ),
+        use_existing_browser=_coerce_bool(
+            bot.get("use_existing_browser", defaults["use_existing_browser"]),
+            "bot.use_existing_browser",
+        ),
+        existing_browser_cdp_url=_coerce_optional_string(
+            bot.get("existing_browser_cdp_url", defaults["existing_browser_cdp_url"]),
+            default=str(defaults["existing_browser_cdp_url"]),
+        ),
+        start_from_current_page=_coerce_bool(
+            bot.get("start_from_current_page", defaults["start_from_current_page"]),
+            "bot.start_from_current_page",
+        ),
+        execution_mode=_coerce_optional_string(
+            bot.get("execution_mode", defaults["execution_mode"]),
+            default=str(defaults["execution_mode"]),
+        ).lower(),
         notification_close_selectors=_coerce_string_list(
             bot.get("notification_close_selectors", defaults["notification_close_selectors"]),
             "bot.notification_close_selectors",

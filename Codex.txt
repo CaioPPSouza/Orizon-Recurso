@@ -1,0 +1,10 @@
+Iniciar no terminal escrever= códex
+
+Criar o agente de instrução= /init (Apenas quando for preciso, geralmente criado a primeira vez a IA vai salvando suas preferencias no agente).
+
+Comando para executar a aplicação: python -m src.main
+
+O navegador já tem que está aberto na tela onde preenche o protocolo e todas as informações da guia e deve ser aberto via CMD com o comando abaixo:
+
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-cdp"
+

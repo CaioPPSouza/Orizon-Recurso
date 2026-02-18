@@ -69,6 +69,7 @@ def test_build_bot_settings_maps_automatic_login_fields():
             "close_notifications_after_login": "true",
             "notification_close_selectors": ["  button:has-text('Fechar')  ", ""],
             "selected_operator_code": " 421715 ",
+            "resource_option_value": "  Itens Guia  ",
         }
     }
 
@@ -85,6 +86,7 @@ def test_build_bot_settings_maps_automatic_login_fields():
     assert settings.close_notifications_after_login is True
     assert settings.notification_close_selectors == ["button:has-text('Fechar')"]
     assert settings.selected_operator_code == "421715"
+    assert settings.resource_option_value == "Itens Guia"
 
 
 def test_build_bot_settings_uses_env_fallback_for_login_credentials(monkeypatch):
@@ -103,3 +105,21 @@ def test_build_bot_settings_uses_env_fallback_for_login_credentials(monkeypatch)
 
     assert settings.login_username == "usuario.env"
     assert settings.login_password == "senha.env"
+
+
+def test_build_bot_settings_maps_existing_browser_and_execution_mode():
+    config = {
+        "bot": {
+            "use_existing_browser": "true",
+            "existing_browser_cdp_url": "  http://127.0.0.1:9333  ",
+            "start_from_current_page": "1",
+            "execution_mode": "HEADER_PROTOCOL_ONLY",
+        }
+    }
+
+    settings = build_bot_settings(config)
+
+    assert settings.use_existing_browser is True
+    assert settings.existing_browser_cdp_url == "http://127.0.0.1:9333"
+    assert settings.start_from_current_page is True
+    assert settings.execution_mode == "header_protocol_only"
