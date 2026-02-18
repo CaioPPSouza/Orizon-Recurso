@@ -65,6 +65,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "screenshot_dir": "logs/screenshots",
         "object_resource_value": "",
         "grau_participacao_value": "",
+        "selected_operator_code": "",
         "navigation_steps": [],
         "selectors": {
             "new_guide_button": "",
@@ -134,6 +135,7 @@ def build_bot_settings(config: dict[str, Any]) -> BotSettings:
         ),
         object_resource_value=_coerce_optional_string(bot.get("object_resource_value", ""), default=""),
         grau_participacao_value=_coerce_optional_string(bot.get("grau_participacao_value", ""), default=""),
+        selected_operator_code=_coerce_optional_string(bot.get("selected_operator_code", ""), default=""),
         error_mode=_coerce_optional_string(bot.get("error_mode", "tolerant"), default="tolerant"),
         login_mode=_coerce_optional_string(bot.get("login_mode", "manual"), default="manual").lower(),
         login_username=login_username,

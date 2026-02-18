@@ -41,6 +41,7 @@ Edite `config/config.json`:
 
 - `bot.object_resource_value`: valor do combo "Objeto Recurso".
 - `bot.grau_participacao_value`: valor do campo "Grau de participacao".
+- `bot.selected_operator_code`: codigo da operadora (`5711`, `421715`, `333689`) para a execucao atual.
 - `bot.login_mode`: `manual` (aguarda login humano) ou `automatic` (preenche e envia login).
 - `bot.login_username` e `bot.login_password`: credenciais para login automatico.
 - `bot.login_username_selector`, `bot.login_password_selector`, `bot.login_submit_selector`: seletores da tela de login.
@@ -52,6 +53,7 @@ Edite `config/config.json`:
 - Inclui suporte ao tutorial inicial (`Terminar`) e modais com botao `Fechar`.
 - Apos login confirmado, o fluxo aguarda 10 segundos e envia `ESC` para dispensar janelas iniciais.
 - O fluxo tambem fecha automaticamente janelas/abas extras e dialogos JS (`alert`, `confirm`, `prompt`) apos o login.
+- Na interface, a selecao da operadora e obrigatoria antes de habilitar o botao `Iniciar`.
 - Nao versione credenciais reais no repositório.
 - `bot.navigation_steps`: lista de seletores para navegar no menu ate a tela de recurso.
 - `bot.selectors`: seletores dos campos e botoes do portal.

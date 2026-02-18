@@ -54,6 +54,7 @@
     "screenshot_dir": "logs/screenshots",
     "object_resource_value": "Recurso de Guia",
     "grau_participacao_value": "Executante",
+    "selected_operator_code": "",
     "navigation_steps": [
       "#linkTopbarModuloGlosas",
       "#ctl00_menutab_T1",

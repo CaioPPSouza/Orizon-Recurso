@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
-from src.bot.automator import BotSettings, OrizonAutomator
+import pytest
+
+from src.bot.automator import AutomationConfigurationError, BotSettings, OrizonAutomator
 
 
 def _build_settings() -> BotSettings:
@@ -62,3 +65,10 @@ def test_decode_base64_url_invalid_returns_empty_string():
     decoded = automator._decode_base64_url("###")
 
     assert decoded == ""
+
+
+def test_rejects_invalid_selected_operator_code():
+    invalid_settings = replace(_build_settings(), selected_operator_code="9999")
+
+    with pytest.raises(AutomationConfigurationError):
+        OrizonAutomator(invalid_settings)

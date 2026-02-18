@@ -68,6 +68,7 @@ def test_build_bot_settings_maps_automatic_login_fields():
             "post_login_open_new_tab": "1",
             "close_notifications_after_login": "true",
             "notification_close_selectors": ["  button:has-text('Fechar')  ", ""],
+            "selected_operator_code": " 421715 ",
         }
     }
 
@@ -83,6 +84,7 @@ def test_build_bot_settings_maps_automatic_login_fields():
     assert settings.post_login_open_new_tab is True
     assert settings.close_notifications_after_login is True
     assert settings.notification_close_selectors == ["button:has-text('Fechar')"]
+    assert settings.selected_operator_code == "421715"
 
 
 def test_build_bot_settings_uses_env_fallback_for_login_credentials(monkeypatch):

@@ -41,6 +41,7 @@ class BotSettings:
     selectors: dict[str, str]
     object_resource_value: str
     grau_participacao_value: str
+    selected_operator_code: str = ""
     error_mode: str = "tolerant"
     login_mode: str = "manual"
     login_username: str = ""
@@ -97,6 +98,8 @@ class OrizonAutomator:
         }
 
         callbacks.log("Iniciando navegador e preparando sessao no portal ORIZON.")
+        if self.settings.selected_operator_code:
+            callbacks.log(f"Operadora selecionada para esta execucao: {self.settings.selected_operator_code}.")
 
         with sync_playwright() as playwright:
             browser, page = self._open_browser(playwright)
@@ -648,6 +651,14 @@ class OrizonAutomator:
             callbacks.log(f"Nao foi possivel gerar screenshot: {exc}")
 
     def _validate_settings(self) -> None:
+        if self.settings.selected_operator_code:
+            allowed_operator_codes = {"5711", "421715", "333689"}
+            if self.settings.selected_operator_code not in allowed_operator_codes:
+                raise AutomationConfigurationError(
+                    "Valor invalido para 'bot.selected_operator_code'. "
+                    "Use 5711, 421715 ou 333689."
+                )
+
         if not self.settings.object_resource_value.strip():
             raise AutomationConfigurationError(
                 "Configure 'bot.object_resource_value' no arquivo config/config.json."

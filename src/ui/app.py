@@ -23,6 +23,7 @@ class MainWindow(Tk):
         ttk.Style(self).theme_use("clam")
 
         self.file_path_var = StringVar(value="")
+        self.operator_code_var = StringVar(value="")
         self.status_var = StringVar(value="Aguardando")
         self.current_line_var = StringVar(value="-")
         self.current_password_var = StringVar(value="-")
@@ -62,6 +63,17 @@ class MainWindow(Tk):
 
         self.stop_button = ttk.Button(control_frame, text="Parar", command=self._request_stop, state=DISABLED)
         self.stop_button.pack(side="left", padx=8)
+
+        ttk.Label(control_frame, text="Operadora:").pack(side="left", padx=(18, 6))
+        self.operator_combo = ttk.Combobox(
+            control_frame,
+            textvariable=self.operator_code_var,
+            values=("5711", "421715", "333689"),
+            state="readonly",
+            width=10,
+        )
+        self.operator_combo.pack(side="left")
+        self.operator_combo.bind("<<ComboboxSelected>>", self._on_operator_selected)
 
         status_frame = ttk.LabelFrame(main, text="Status e indicadores", padding=12)
         status_frame.pack(fill="x")
@@ -132,7 +144,7 @@ class MainWindow(Tk):
                 f"{spreadsheet_data.summary.total_guides} guia(s) prevista(s)."
             )
             self._set_status("Aguardando")
-            self.start_button.config(state=NORMAL)
+            self._refresh_start_button_state()
         except SpreadsheetValidationError as exc:
             self._set_status("Erro")
             self._append_log(f"Erro ao validar planilha: {exc}")
@@ -150,6 +162,10 @@ class MainWindow(Tk):
         if not selected:
             self._append_log("Selecione uma planilha antes de iniciar.")
             return
+        selected_operator_code = self.operator_code_var.get().strip()
+        if not selected_operator_code:
+            self._append_log("Selecione a operadora (5711, 421715 ou 333689) antes de iniciar.")
+            return
 
         self._stop_event.clear()
         self._set_counter("guides_completed", 0)
@@ -162,9 +178,9 @@ class MainWindow(Tk):
         self.start_button.config(state=DISABLED)
         self.stop_button.config(state=NORMAL)
         self._set_status("Executando")
-        self._append_log("Execucao iniciada.")
+        self._append_log(f"Execucao iniciada para operadora {selected_operator_code}.")
 
-        self._worker_thread = Thread(target=self._run_worker, args=(selected,), daemon=True)
+        self._worker_thread = Thread(target=self._run_worker, args=(selected, selected_operator_code), daemon=True)
         self._worker_thread.start()
 
     def _request_stop(self) -> None:
@@ -174,7 +190,7 @@ class MainWindow(Tk):
         self._set_status("Parando")
         self._append_log("Parada solicitada. O sistema vai finalizar a acao atual e encerrar.")
 
-    def _run_worker(self, file_path: str) -> None:
+    def _run_worker(self, file_path: str, selected_operator_code: str) -> None:
         logger = _create_run_logger()
         log_file_path = str(_extract_log_path(logger))
         self._event_queue.put(("log_file", log_file_path))
@@ -186,6 +202,7 @@ class MainWindow(Tk):
 
         try:
             config = load_runtime_config()
+            config.setdefault("bot", {})["selected_operator_code"] = selected_operator_code
             sheet_name = get_sheet_name(config)
             spreadsheet_data = load_and_group_spreadsheet(file_path, sheet_name=sheet_name)
 
@@ -196,7 +213,7 @@ class MainWindow(Tk):
                 (
                     "log",
                     f"Planilha pronta para execucao: {spreadsheet_data.summary.total_rows} linha(s), "
-                    f"{spreadsheet_data.summary.total_guides} senha(s).",
+                    f"{spreadsheet_data.summary.total_guides} senha(s). Operadora: {selected_operator_code}.",
                 )
             )
 
@@ -281,7 +298,7 @@ class MainWindow(Tk):
             elif event == "log_file":
                 self.log_file_var.set(str(payload))
             elif event == "execution_finished":
-                self.start_button.config(state=NORMAL if self.file_path_var.get().strip() else DISABLED)
+                self._refresh_start_button_state()
                 self.stop_button.config(state=DISABLED)
 
         self.after(120, self._process_events)
@@ -303,6 +320,20 @@ class MainWindow(Tk):
         self.log_output.insert(END, line)
         self.log_output.see(END)
         self.log_output.config(state=DISABLED)
+
+    def _on_operator_selected(self, _event=None) -> None:
+        selected_operator_code = self.operator_code_var.get().strip()
+        if selected_operator_code:
+            self._append_log(f"Operadora selecionada: {selected_operator_code}.")
+        self._refresh_start_button_state()
+
+    def _refresh_start_button_state(self) -> None:
+        can_start = (
+            bool(self.file_path_var.get().strip())
+            and bool(self.operator_code_var.get().strip())
+            and not (self._worker_thread and self._worker_thread.is_alive())
+        )
+        self.start_button.config(state=NORMAL if can_start else DISABLED)
 
 
 def _create_run_logger() -> logging.Logger:
