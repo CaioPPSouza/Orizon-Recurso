@@ -64,6 +64,10 @@ def test_build_bot_settings_maps_automatic_login_fields():
             "login_username_selector": "  #username  ",
             "login_password_selector": "  #password  ",
             "login_submit_selector": "  #kc-login  ",
+            "post_login_url": "  https://example.com/portal  ",
+            "post_login_open_new_tab": "1",
+            "close_notifications_after_login": "true",
+            "notification_close_selectors": ["  button:has-text('Fechar')  ", ""],
         }
     }
 
@@ -75,6 +79,10 @@ def test_build_bot_settings_maps_automatic_login_fields():
     assert settings.login_username_selector == "#username"
     assert settings.login_password_selector == "#password"
     assert settings.login_submit_selector == "#kc-login"
+    assert settings.post_login_url == "https://example.com/portal"
+    assert settings.post_login_open_new_tab is True
+    assert settings.close_notifications_after_login is True
+    assert settings.notification_close_selectors == ["button:has-text('Fechar')"]
 
 
 def test_build_bot_settings_uses_env_fallback_for_login_credentials(monkeypatch):
